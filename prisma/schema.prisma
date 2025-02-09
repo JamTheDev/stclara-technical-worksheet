@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id       String    @id @default(cuid())
+  fullname String
+  userId   String    @unique
+  friends  Profile[] @relation("Friendship")
+  friendOf Profile[] @relation("Friendship")
+
+  FriendRequestSent      FriendRequest[] @relation("FriendRequestsSent")
+  FriendRequestsReceived FriendRequest[] @relation("FriendRequestsReceived")
+}
+
+model Food {
+  id         String   @id @default(cuid())
+  name       String   @default("Untitled")
+  attachment String
+  reviews    Review[]
+  uploadDate DateTime @default(now())
+}
+
+model Todo {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  userId      String    @db.Uuid
+  completed   Boolean
+  createdAt   DateTime
+  dueDate     DateTime?
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  name       String
+  attachment String
+  createdAt  DateTime
+}
+
+model Photo {
+  id         String @id @default(cuid())
+  name       String
+  attachment String
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  content     String
+  createdAt   DateTime
+  createdById String   @db.Uuid
+  foodId      String?
+  food        Food?    @relation(fields: [foodId], references: [id])
+  pokemonId   String?
+  pokemon     Pokemon? @relation(fields: [pokemonId], references: [id])
+}
+
+model Pokemon {
+  id         String   @id @default(cuid())
+  name       String
+  attachment String
+  reviews    Review[]
+}
+
+model Secret {
+  id         String   @id @default(cuid())
+  userId     String   @db.Uuid
+  message    String
+  created_at DateTime
+  updated_at DateTime
+}
+
+model Attachment {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  createdAt   DateTime
+  createdById String   @db.Uuid
+}
+
+model FriendRequest {
+  id         String              @id @default(cuid())
+  senderId   String
+  receiverId String
+  status     FriendRequestStatus @default(PENDING)
+  createdAt  DateTime            @default(now())
+
+  sender   Profile @relation("FriendRequestsSent", fields: [senderId], references: [id])
+  receiver Profile @relation("FriendRequestsReceived", fields: [receiverId], references: [id])
+}
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
