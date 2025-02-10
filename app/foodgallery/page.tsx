@@ -62,6 +62,7 @@ const FoodGalleryPage: React.FC = () => {
     }
     dispatch(getAllFoods()).then((data: any) => {
       data.payload.forEach((food: any) => {
+        console.log(food.id);
         addFoodReviewToList(food.id, food.reviews);
       });
     });
@@ -69,7 +70,6 @@ const FoodGalleryPage: React.FC = () => {
 
   const addFoodReviewToList = (foodId: string, data: any) => {
     const newReviewsMap: Record<string, Review[]> = {};
-    console.log(data);
     data.forEach((review: Review) => {
       if (newReviewsMap[foodId]) {
         newReviewsMap[foodId].push(review);
@@ -77,7 +77,7 @@ const FoodGalleryPage: React.FC = () => {
         newReviewsMap[foodId] = [review];
       }
     });
-    setReviewsMap(newReviewsMap);
+    setReviewsMap((map) => ({ ...map, ...newReviewsMap }));
   };
 
   const removeFoodReviews = (foodId: string) => {
@@ -170,17 +170,17 @@ const FoodGalleryPage: React.FC = () => {
   };
 
   const handleDeleteReview = (foodId: string, reviewId: string) => {
-        toast.promise(dispatch(deleteFoodReview(reviewId)), {
-          loading: "Deleting review...",
-          success: (data) => {
-            setReviewsMap((prev) => ({
-              ...prev,
-              [foodId]: prev[foodId].filter((review) => review.id !== reviewId),
-            }));
-            return "Review deleted!";
-          },
-          error: "Failed to delete review, please try again.",
-        });
+    toast.promise(dispatch(deleteFoodReview(reviewId)), {
+      loading: "Deleting review...",
+      success: (data) => {
+        setReviewsMap((prev) => ({
+          ...prev,
+          [foodId]: prev[foodId].filter((review) => review.id !== reviewId),
+        }));
+        return "Review deleted!";
+      },
+      error: "Failed to delete review, please try again.",
+    });
   };
 
   return (

@@ -53,13 +53,36 @@ export const createFood = createAsyncThunk(
 
 export const getFood = createAsyncThunk(
   "foodgallery/getFood",
-  async (id: string, { rejectWithValue }) => {
+  async (
+    {
+      id,
+      sortByName,
+      sortByUploadDate,
+    }: {
+      id?: string;
+      sortByName?: "asc" | "desc";
+      sortByUploadDate?: "asc" | "desc";
+    },
+    { rejectWithValue }
+  ) => {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("Food")
-      .select("*")
-      .eq("id", id)
-      .single();
+    let query = supabase.from("Food").select("*");
+
+    if (id) {
+      query = query.eq("id", id);
+    }
+
+    if (sortByName) {
+      query = query.order("name", { ascending: sortByName === "asc" });
+    }
+
+    if (sortByUploadDate) {
+      query = query.order("uploadDate", {
+        ascending: sortByUploadDate === "asc",
+      });
+    }
+
+    const { data, error } = id ? await query.single() : await query;
     if (error) {
       console.error(error);
       return rejectWithValue(error.message);
