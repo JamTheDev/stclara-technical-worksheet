@@ -1,5 +1,5 @@
 import { generateCUID } from "@/utils/cuid";
-import { createClient } from "@/utils/supabase/client";
+import { createProdClient } from "@/utils/supabase/client";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // Create a new Todo
@@ -13,7 +13,7 @@ export const createTodo = createAsyncThunk(
         }: { title: string; description?: string | null; dueDate?: Date | null },
         { rejectWithValue }
     ) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const session = await supabase.auth.getSession();
 
         if (!session.data.session) {
@@ -45,7 +45,7 @@ export const createTodo = createAsyncThunk(
 export const getTodo = createAsyncThunk(
     "todos/get",
     async (id: string, { rejectWithValue }) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const session = await supabase.auth.getSession();
 
         if (!session.data.session) {
@@ -71,7 +71,7 @@ export const getTodo = createAsyncThunk(
 export const getAllTodos = createAsyncThunk(
     "todos/getAll",
     async (_, { rejectWithValue }) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const session = await supabase.auth.getSession();
 
         if (!session.data.session) {
@@ -105,7 +105,7 @@ export const updateTodo = createAsyncThunk(
         }: { id: string; title: string; description?: string | null; completed: boolean; dueDate?: Date | null },
         { rejectWithValue }
     ) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const session = await supabase.auth.getSession();
 
         if (!session.data.session) {
@@ -140,7 +140,7 @@ export const updateTodo = createAsyncThunk(
 export const deleteTodo = createAsyncThunk(
     "todos/delete",
     async (id: string, { rejectWithValue }) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const session = await supabase.auth.getSession();
 
         if (!session.data.session) {

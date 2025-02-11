@@ -109,7 +109,8 @@ export default function SecretPage3() {
   // Send friend request.
   const handleAddFriend = async (userId: string) => {
     setLoadingSendFriend((prev) => [...prev, userId]);
-    const res = await dispatch(sendFriendRequest(userId));
+    const res = await dispatch(sendFriendRequest({ receiverUserId: userId }));
+    
     setLoadingSendFriend((prev) => prev.filter((id) => id !== userId));
     if (res.payload.error) {
       toast.error("Failed to send friend request");

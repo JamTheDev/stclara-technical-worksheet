@@ -1,5 +1,5 @@
 import { generateCUID } from "@/utils/cuid";
-import { createClient } from "@/utils/supabase/client";
+import { createProdClient } from "@/utils/supabase/client";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // Helper: Construct file path from id and original file extension
@@ -12,7 +12,7 @@ const getFilePath = (id: string, fileName: string) => {
 export const createAttachment = createAsyncThunk(
   "attachments/create",
   async ({ file }: { file: File }, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
       return rejectWithValue("User is not logged in");
@@ -58,7 +58,7 @@ export const createAttachment = createAsyncThunk(
 export const getAttachment = createAsyncThunk(
   "attachments/get",
   async (id: string, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
       return rejectWithValue("User is not logged in");
@@ -90,7 +90,7 @@ export const getAllAttachments = createAsyncThunk(
     },
     { rejectWithValue }
   ) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
       return rejectWithValue("User is not logged in");
@@ -121,7 +121,7 @@ export const getAllAttachments = createAsyncThunk(
 export const updateAttachment = createAsyncThunk(
   "attachments/update",
   async ({ id, file }: { id: string; file: File }, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
       return rejectWithValue("User is not logged in");
@@ -160,7 +160,7 @@ export const updateAttachment = createAsyncThunk(
 export const deleteAttachment = createAsyncThunk(
   "attachments/delete",
   async (id: string, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
       return rejectWithValue("User is not logged in");

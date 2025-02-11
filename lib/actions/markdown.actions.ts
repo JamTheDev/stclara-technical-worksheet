@@ -1,5 +1,5 @@
 import { generateCUID } from "@/utils/cuid";
-import { createClient } from "@/utils/supabase/client";
+import { createProdClient } from "@/utils/supabase/client";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const upsertMarkdownNote = createAsyncThunk(
@@ -13,7 +13,7 @@ export const upsertMarkdownNote = createAsyncThunk(
     }: { id?: string; markdownFile: File; name: string; createdAt?: Date },
     { rejectWithValue }
   ) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const dateUploaded = Date.now().toString();
     const { data, error } = await supabase.storage
       .from("markdownNotes")
@@ -52,7 +52,7 @@ export const upsertMarkdownNote = createAsyncThunk(
 export const getMarkdownNote = createAsyncThunk(
   "markdown/get",
   async (id: string) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
 
     const { data, error } = await supabase
       .from("Note")
@@ -72,7 +72,7 @@ export const getMarkdownNote = createAsyncThunk(
 export const getAllMarkdownNotes = createAsyncThunk(
   "markdown/getAll",
   async () => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
 
     const { data, error } = await supabase.from("Note").select("*");
 
@@ -88,7 +88,7 @@ export const getAllMarkdownNotes = createAsyncThunk(
 export const deleteMarkdownNote = createAsyncThunk(
   "markdown/delete",
   async (noteId: string) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
 
     const { data, error } = await supabase
       .from("Note")

@@ -1,5 +1,5 @@
 import { generateCUID } from "@/utils/cuid";
-import { createClient } from "@/utils/supabase/client";
+import { createProdClient } from "@/utils/supabase/client";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const getFilePath = (id: string, fileName: string) => {
@@ -10,7 +10,7 @@ const getFilePath = (id: string, fileName: string) => {
 export const createPokemon = createAsyncThunk(
     "pokemon/createPokemon",
     async ({ file, name }: { file: File; name: string }, { rejectWithValue }) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const session = await supabase.auth.getSession();
         if (!session.data.session) {
             return rejectWithValue("User is not logged in");
@@ -65,7 +65,7 @@ export const getPokemon = createAsyncThunk(
         },
         { rejectWithValue }
     ) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         let query = supabase.from("Pokemon").select("*");
 
         if (id) {
@@ -94,7 +94,7 @@ export const getPokemon = createAsyncThunk(
 export const getAllPokemons = createAsyncThunk(
     "pokemon/getAllPokemons",
     async (_, { rejectWithValue }) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const { data, error } = await supabase
             .from("Pokemon")
             .select(`*, reviews:Review(*)`)
@@ -113,7 +113,7 @@ export const updatePokemon = createAsyncThunk(
         { id, file, name }: { id: string; file?: File; name?: string },
         { rejectWithValue }
     ) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const session = await supabase.auth.getSession();
         if (!session.data.session) {
             return rejectWithValue("User is not logged in");
@@ -154,7 +154,7 @@ export const updatePokemon = createAsyncThunk(
 export const deletePokemon = createAsyncThunk(
     "pokemon/deletePokemon",
     async (id: string, { rejectWithValue }) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
 
         const { data: pokemon, error: fetchError } = await supabase
             .from("Pokemon")
@@ -198,7 +198,7 @@ export const createPokemonReview = createAsyncThunk(
         { pokemonId, content }: { pokemonId: string; content: string },
         { rejectWithValue }
     ) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const session = await supabase.auth.getSession();
         if (!session.data.session) {
             return rejectWithValue("User is not logged in");
@@ -229,7 +229,7 @@ export const createPokemonReview = createAsyncThunk(
 export const deletePokemonReview = createAsyncThunk(
     "pokemon/deletePokemonReview",
     async (id: string, { rejectWithValue }) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const session = await supabase.auth.getSession();
         if (!session.data.session) {
             return rejectWithValue("User is not logged in");
@@ -254,7 +254,7 @@ export const deletePokemonReview = createAsyncThunk(
 export const getFirstThreePokemonReviews = createAsyncThunk(
     "pokemon/getFirstThreePokemonReviews",
     async (pokemonId: string, { rejectWithValue }) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const { data, error } = await supabase
             .from("Review")
             .select("*")
@@ -273,7 +273,7 @@ export const getFirstThreePokemonReviews = createAsyncThunk(
 export const getPokemonReviews = createAsyncThunk(
     "pokemon/getPokemonReviews",
     async (pokemonId: string, { rejectWithValue }) => {
-        const supabase = await createClient();
+        const supabase = await createProdClient();
         const { data, error } = await supabase
             .from("Review")
             .select("*")

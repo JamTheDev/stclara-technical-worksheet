@@ -1,5 +1,5 @@
 import { generateCUID } from "@/utils/cuid";
-import { createClient } from "@/utils/supabase/client";
+import { createProdClient } from "@/utils/supabase/client";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const getFilePath = (id: string, fileName: string) => {
@@ -10,7 +10,7 @@ const getFilePath = (id: string, fileName: string) => {
 export const createFood = createAsyncThunk(
   "foodgallery/createFood",
   async ({ file, name }: { file: File; name: string }, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
       return rejectWithValue("User is not logged in");
@@ -65,7 +65,7 @@ export const getFood = createAsyncThunk(
     },
     { rejectWithValue }
   ) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     let query = supabase.from("Food").select("*");
 
     if (id) {
@@ -94,7 +94,7 @@ export const getFood = createAsyncThunk(
 export const getAllFoods = createAsyncThunk(
   "foodgallery/getAllFoods",
   async (_, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const { data, error } = await supabase
       .from("Food")
       .select(`*, reviews:Review(*)`)
@@ -113,7 +113,7 @@ export const updateFood = createAsyncThunk(
     { id, file, name }: { id: string; file?: File; name?: string },
     { rejectWithValue }
   ) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
       return rejectWithValue("User is not logged in");
@@ -154,7 +154,7 @@ export const updateFood = createAsyncThunk(
 export const deleteFood = createAsyncThunk(
   "foodgallery/deleteFood",
   async (id: string, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
 
     const { data: food, error: fetchError } = await supabase
       .from("Food")
@@ -199,7 +199,7 @@ export const createFoodReview = createAsyncThunk(
     { foodId, content }: { foodId: string; content: string },
     { rejectWithValue }
   ) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
       return rejectWithValue("User is not logged in");
@@ -231,7 +231,7 @@ export const createFoodReview = createAsyncThunk(
 export const deleteFoodReview = createAsyncThunk(
   "foodgallery/deleteFoodReview",
   async (id: string, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
       return rejectWithValue("User is not logged in");
@@ -257,7 +257,7 @@ export const deleteFoodReview = createAsyncThunk(
 export const getFirstThreeFoodReviews = createAsyncThunk(
   "foodgallery/getFirstThreeFoodReviews",
   async (foodId: string, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const { data, error } = await supabase
       .from("Review")
       .select("*")
@@ -277,7 +277,7 @@ export const getFirstThreeFoodReviews = createAsyncThunk(
 export const getFoodReviews = createAsyncThunk(
   "foodgallery/getFoodReviews",
   async (foodId: string, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await createProdClient();
     const { data, error } = await supabase
       .from("Review")
       .select("*")

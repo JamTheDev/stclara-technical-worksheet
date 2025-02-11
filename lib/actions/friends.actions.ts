@@ -1,8 +1,18 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { createClient } from "@/utils/supabase/client";
+import { createProdClient } from "@/utils/supabase/client";
 import { generateCUID } from "@/utils/cuid";
 
-async function getProfileId(
+async function getClient() {
+  if (process.env.NODE_ENV === "test") {
+    const mod = await import("@/utils/supabase/testing");
+    return mod.default;
+  } else {
+    const mod = await import("@/utils/supabase/client");
+    return mod.createProdClient();
+  }
+}
+
+export async function getProfileId(
   supabase: any,
   userId: string,
   rejectWithValue: any
@@ -23,7 +33,7 @@ async function getProfileId(
 export const getFriends = createAsyncThunk(
   "friends/get",
   async (_, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await getClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -57,7 +67,7 @@ export const getFriends = createAsyncThunk(
       .eq("status", "ACCEPTED");
 
     if (error) {
-        console.error(error);
+      console.error(error);
       return rejectWithValue(error.message);
     }
     return data;
@@ -67,7 +77,7 @@ export const getFriends = createAsyncThunk(
 export const getSentFriendRequests = createAsyncThunk(
   "friends/getSentRequests",
   async (_, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await getClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -98,7 +108,7 @@ export const getSentFriendRequests = createAsyncThunk(
 export const getFriendRequests = createAsyncThunk(
   "friends/getRequests",
   async (_, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await getClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -129,7 +139,7 @@ export const getFriendRequests = createAsyncThunk(
 export const getReceivedFriendRequests = createAsyncThunk(
   "friends/getReceivedRequests",
   async (_, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await getClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -159,8 +169,14 @@ export const getReceivedFriendRequests = createAsyncThunk(
 
 export const sendFriendRequest = createAsyncThunk(
   "friends/sendRequest",
-  async (receiverProfileId: string, { rejectWithValue }) => {
-    const supabase = await createClient();
+  async (
+    {
+      receiverProfileId,
+      receiverUserId,
+    }: { receiverProfileId?: string; receiverUserId?: string },
+    { rejectWithValue }
+  ) => {
+    const supabase = await getClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -173,6 +189,14 @@ export const sendFriendRequest = createAsyncThunk(
       rejectWithValue
     );
     if (!senderProfileId) return;
+
+    if (receiverUserId) {
+      receiverProfileId = await getProfileId(
+        supabase,
+        receiverUserId,
+        rejectWithValue
+      );
+    }
 
     const { data, error } = await supabase
       .from("FriendRequest")
@@ -194,7 +218,7 @@ export const sendFriendRequest = createAsyncThunk(
 export const acceptFriendRequest = createAsyncThunk(
   "friends/acceptRequest",
   async (friendRequestId: string, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await getClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -219,7 +243,6 @@ export const acceptFriendRequest = createAsyncThunk(
       .select("*")
       .single();
 
-
     if (error) {
       return rejectWithValue(error.message);
     }
@@ -229,7 +252,7 @@ export const acceptFriendRequest = createAsyncThunk(
 export const removeFriend = createAsyncThunk(
   "friends/remove",
   async (friendRequestId: string, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await getClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -253,7 +276,7 @@ export const removeFriend = createAsyncThunk(
 export const getUsers = createAsyncThunk(
   "users/getUsers",
   async (_, { rejectWithValue }) => {
-    const supabase = await createClient();
+    const supabase = await getClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {

@@ -8,7 +8,7 @@ async function getClient() {
     return mod.default;
   } else {
     const mod = await import("@/utils/supabase/client");
-    return mod.createClient();
+    return mod.createProdClient();
   }
 }
 
