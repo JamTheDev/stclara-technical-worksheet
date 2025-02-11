@@ -1,5 +1,5 @@
 "use client";
-import LoadingForeground from "@/_components/loading-foreground";
+import LoadingForeground from "@/_components/loading";
 import {
   checkUserLoggedIn,
   loginUser,
@@ -221,32 +221,65 @@ export default function Home() {
 
   function HomePage() {
     return (
-      <div className="w-screen h-screen flex flex-col items-center justify-center bg-white">
-        <span className="text-black text-4xl mb-8">You are authenticated!</span>
-        <div className="flex space-x-4">
+      <div className="w-screen min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-100 to-indigo-100 p-4">
+        <h1 className="text-5xl font-bold text-gray-800 mb-4">Welcome Back!</h1>
+        <p className="text-lg text-gray-600 mb-8">You are successfully authenticated.</p>
+        <div className="grid grid-cols-2 gap-4 mb-8">
           <a
             href="/secret-page-1"
-            className="px-5 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 transition duration-200"
+            className="flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-200"
           >
             View My Secret
           </a>
           <a
             href="/secret-page-2"
-            className="px-5 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 transition duration-200"
+            className="flex items-center justify-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition duration-200"
           >
             Add / Update Secret
           </a>
           <a
             href="/secret-page-3"
-            className="px-5 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition duration-200"
+            className="flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-200"
           >
-            See other Secrets
+            See Other Secrets
+          </a>
+          <a
+            href="/neodrive"
+            className="flex items-center justify-center px-6 py-3 bg-pink-600 text-white font-semibold rounded-lg shadow-lg hover:bg-pink-700 transition duration-200"
+          >
+            NeoDrive
+          </a>
+          <a
+            href="/todo"
+            className="flex items-center justify-center px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:bg-yellow-600 transition duration-200"
+          >
+            Todo
+          </a>
+          <a
+            href="/foodgallery"
+            className="flex items-center justify-center px-6 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 transition duration-200"
+          >
+            Food Gallery
+          </a>
+          <a
+            href="/pokemon"
+            className="flex items-center justify-center px-6 py-3 bg-purple-500 text-white font-semibold rounded-lg shadow-lg hover:bg-purple-600 transition duration-200"
+          >
+            Pokemon
+          </a>
+          <a
+            href="/md"
+            className="flex items-center justify-center px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-600 transition duration-200"
+          >
+            Markdown
           </a>
         </div>
-
         <button
           onClick={() => dispatch(logoutUser())}
-          className="mt-8 px-5 py-2 bg-red-600 text-white rounded-md shadow hover:bg-red-700 transition duration-200">Log Out from Account</button>
+          className="mt-4 px-8 py-3 bg-red-600 text-white font-semibold rounded-lg shadow hover:bg-red-700 transition duration-200"
+        >
+          Log Out
+        </button>
       </div>
     );
   }
