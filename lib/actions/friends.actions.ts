@@ -2,16 +2,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { createProdClient } from "@/utils/supabase/client";
 import { generateCUID } from "@/utils/cuid";
 
-async function getClient() {
-  if (process.env.NODE_ENV === "test") {
-    const mod = await import("@/utils/supabase/testing");
-    return mod.default;
-  } else {
-    const mod = await import("@/utils/supabase/client");
-    return mod.createProdClient();
-  }
-}
-
 export async function getProfileId(
   supabase: any,
   userId: string,
@@ -33,7 +23,7 @@ export async function getProfileId(
 export const getFriends = createAsyncThunk(
   "friends/get",
   async (_, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -77,7 +67,7 @@ export const getFriends = createAsyncThunk(
 export const getSentFriendRequests = createAsyncThunk(
   "friends/getSentRequests",
   async (_, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -108,7 +98,7 @@ export const getSentFriendRequests = createAsyncThunk(
 export const getFriendRequests = createAsyncThunk(
   "friends/getRequests",
   async (_, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -139,7 +129,7 @@ export const getFriendRequests = createAsyncThunk(
 export const getReceivedFriendRequests = createAsyncThunk(
   "friends/getReceivedRequests",
   async (_, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -176,7 +166,7 @@ export const sendFriendRequest = createAsyncThunk(
     }: { receiverProfileId?: string; receiverUserId?: string },
     { rejectWithValue }
   ) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -218,7 +208,7 @@ export const sendFriendRequest = createAsyncThunk(
 export const acceptFriendRequest = createAsyncThunk(
   "friends/acceptRequest",
   async (friendRequestId: string, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -252,7 +242,7 @@ export const acceptFriendRequest = createAsyncThunk(
 export const removeFriend = createAsyncThunk(
   "friends/remove",
   async (friendRequestId: string, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -276,7 +266,7 @@ export const removeFriend = createAsyncThunk(
 export const getUsers = createAsyncThunk(
   "users/getUsers",
   async (_, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {

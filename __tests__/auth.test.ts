@@ -8,6 +8,7 @@ import { makeAuthStore, useAppDispatch } from "@/lib/store";
 import authSlice, { AuthStoreType } from "@/lib/stores/auth.store";
 import { generateCUID } from "@/utils/cuid";
 import { User } from "@supabase/supabase-js";
+import { credentialsUserA, credentialsUserB } from "../utils/_config";
 
 
 describe("(Auth) State Mutation Testing", () => {
@@ -57,15 +58,11 @@ describe("(Auth) State Mutation Testing", () => {
 describe("(Auth) Action Testing", () => {
   const mockStore = makeAuthStore();
 
-  it("should register a new user", async () => {
-    const cuid = generateCUID();
-    const user = {
-      email: `${cuid}@test.com`,
-      password: "password",
-      name: `Test User_${cuid}`,
-    };
-    const result = await mockStore.dispatch(registerUser(user));
-    expect(result).toHaveProperty("meta.arg.email");
+  it("should register User A & B", async () => {
+    const resultUserA = await mockStore.dispatch(registerUser(credentialsUserA));
+    const resultUserB = await mockStore.dispatch(registerUser(credentialsUserB));
+    expect(resultUserA).toHaveProperty("meta.arg.email");
+    expect(resultUserB).toHaveProperty("meta.arg.email");
   });
 
   it("should not register a user with an invalid email format", async () => {
@@ -91,7 +88,7 @@ describe("(Auth) Action Testing", () => {
 
   it("should not log in a user when password is missing", async () => {
     const credentials = {
-      email: "testuser@test.com",
+      email: credentialsUserA.email,
       password: "",
     };
     const result = await mockStore.dispatch(loginUser(credentials));
@@ -100,7 +97,7 @@ describe("(Auth) Action Testing", () => {
 
   it("should not log in a user with invalid credentials", async () => {
     const credentials = {
-      email: "unknown@test.com",
+      email: credentialsUserB.email,
       password: "wrongpassword",
     };
     const result = await mockStore.dispatch(loginUser(credentials));

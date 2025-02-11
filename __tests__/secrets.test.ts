@@ -11,6 +11,7 @@ import {
 import { getSecret, upsertSecret } from "@/lib/actions/secrets.actions";
 import { makeAuthStore, makeSecretsStore } from "@/lib/store";
 import { generateCUID } from "@/utils/cuid";
+import { credentialsUserA, credentialsUserB } from "../utils/_config";
 
 describe("(Secrets) Action Testing", () => {
   const secretStore = makeSecretsStore();
@@ -19,21 +20,19 @@ describe("(Secrets) Action Testing", () => {
   let userAId: string;
   let userBId: string;
 
-  const credentialsUserA = {
-    email: `${generateCUID()}@test.com`,
-    password: "T3stP@ssw0rd",
-    name: "Test User 1",
-  };
-
-  const credentialsUserB = {
-    email: `${generateCUID()}@test.com`,
-    password: "T3stP@ssw0rd2",
-    name: "Test User 2",
-  };
-
-  it("should create two new accounts", async () => {
-    const userA: any = await authStore.dispatch(registerUser(credentialsUserA));
-    const userB: any = await authStore.dispatch(registerUser(credentialsUserB));
+  it("should login two new accounts", async () => {
+    const userA: any = await authStore.dispatch(
+      loginUser({
+        email: credentialsUserA.email,
+        password: credentialsUserA.password,
+      })
+    );
+    const userB: any = await authStore.dispatch(
+      loginUser({
+        email: credentialsUserB.email,
+        password: credentialsUserB.password,
+      })
+    );
 
     expect(userA.payload).toHaveProperty(
       "data.session.user.email",
@@ -49,7 +48,12 @@ describe("(Secrets) Action Testing", () => {
   });
 
   it("should add a new secret for both users", async () => {
-    await authStore.dispatch(loginUser(credentialsUserA));
+    await authStore.dispatch(
+      loginUser({
+        email: credentialsUserA.email,
+        password: credentialsUserA.password,
+      })
+    );
     const secretA = await secretStore.dispatch(
       upsertSecret("This is a secret message")
     );
@@ -58,7 +62,12 @@ describe("(Secrets) Action Testing", () => {
     expect(secretA.meta.arg).toEqual("This is a secret message");
 
     // Log in as UserB and add a secret
-    await authStore.dispatch(loginUser(credentialsUserB));
+    await authStore.dispatch(
+      loginUser({
+        email: credentialsUserB.email,
+        password: credentialsUserB.password,
+      })
+    );
     const secretB = await secretStore.dispatch(
       upsertSecret("This is a secret message for user B")
     );
@@ -68,14 +77,20 @@ describe("(Secrets) Action Testing", () => {
   });
 
   it("should not allow UserA to view UserB's secret without being friends", async () => {
-    await authStore.dispatch(loginUser(credentialsUserA));
+    await authStore.dispatch(loginUser({
+      email: credentialsUserA.email,
+      password: credentialsUserA.password,
+    }));
     const secretForUserB = await secretStore.dispatch(getSecret(userBId));
 
     expect(secretForUserB.meta.requestStatus).toEqual("rejected");
   });
 
   it("should send a friend request from UserA to UserB", async () => {
-    await authStore.dispatch(loginUser(credentialsUserA));
+    await authStore.dispatch(loginUser({
+      email: credentialsUserA.email,
+      password: credentialsUserA.password,
+    }));
     const friendRequestResponse = await secretStore.dispatch(
       sendFriendRequest({ receiverUserId: userBId })
     );
@@ -84,7 +99,10 @@ describe("(Secrets) Action Testing", () => {
   });
 
   it("should accept the friend request on UserB side", async () => {
-    await authStore.dispatch(loginUser(credentialsUserB));
+    await authStore.dispatch(loginUser({
+      email: credentialsUserB.email,
+      password: credentialsUserB.password,
+    }));
     const friendRequests = await secretStore.dispatch(getFriendRequests());
 
     expect(friendRequests.meta.requestStatus).toEqual("fulfilled");
@@ -98,7 +116,10 @@ describe("(Secrets) Action Testing", () => {
   });
 
   it("should allow UserA to view UserB's secret", async () => {
-    await authStore.dispatch(loginUser(credentialsUserA));
+    await authStore.dispatch(loginUser({
+      email: credentialsUserA.email,
+      password: credentialsUserA.password,
+    }));
     const secretForUserB = await secretStore.dispatch(getSecret(userBId));
     console.log(secretForUserB.payload);
     expect(secretForUserB.meta.requestStatus).toEqual("fulfilled");
@@ -108,7 +129,10 @@ describe("(Secrets) Action Testing", () => {
   });
 
   it("should allow UserB to view UserA's secret", async () => {
-    await authStore.dispatch(loginUser(credentialsUserB));
+    await authStore.dispatch(loginUser({
+      email: credentialsUserB.email,
+      password: credentialsUserB.password,
+    }));
     const secretForUserA = await secretStore.dispatch(getSecret(userAId));
 
     expect(secretForUserA.meta.requestStatus).toEqual("fulfilled");

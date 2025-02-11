@@ -1,21 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { LoginCredential } from "@/types/auth.types";
 import { generateCUID } from "@/utils/cuid";
+import { createProdClient } from "@/utils/supabase/client";
 
-async function getClient() {
-  if (process.env.NODE_ENV === "test") {
-    const mod = await import("@/utils/supabase/testing");
-    return mod.default;
-  } else {
-    const mod = await import("@/utils/supabase/client");
-    return mod.createProdClient();
-  }
-}
 
 export const loginUser = createAsyncThunk(
   "auth/login",
   async ({ email, password }: LoginCredential, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -30,7 +22,7 @@ export const loginUser = createAsyncThunk(
 export const registerUser = createAsyncThunk(
   "auth/register",
   async (credentials: any, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const { data, error } = await supabase.auth.signUp({
       email: credentials.email,
       password: credentials.password,
@@ -63,7 +55,7 @@ export const registerUser = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const { error } = await supabase.auth.signOut();
 
     if (error) return rejectWithValue(error.message);
@@ -77,7 +69,7 @@ export const logoutUser = createAsyncThunk(
 export const checkUserLoggedIn = createAsyncThunk(
   "auth/checkLoggedIn",
   async (_, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const { data, error } = await supabase.auth.getSession();
 
     if (error) return rejectWithValue(error.message);

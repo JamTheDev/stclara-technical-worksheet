@@ -8,7 +8,6 @@ const getFilePath = (id: string, fileName: string) => {
   return `attachments/${id}.${ext}`;
 };
 
-// Create and upload a new Attachment (image)
 export const createAttachment = createAsyncThunk(
   "attachments/create",
   async ({ file }: { file: File }, { rejectWithValue }) => {

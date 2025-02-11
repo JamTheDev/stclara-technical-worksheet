@@ -3,15 +3,6 @@ import { createProdClient } from "@/utils/supabase/client";
 import { Prisma } from "@prisma/client";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-async function getClient() {
-  if (process.env.NODE_ENV === "test") {
-    const mod = await import("@/utils/supabase/testing");
-    return mod.default;
-  } else {
-    const mod = await import("@/utils/supabase/client");
-    return mod.createProdClient();
-  }
-}
 
 export async function getProfileId(
   supabase: any,
@@ -34,7 +25,7 @@ export async function getProfileId(
 export const upsertSecret = createAsyncThunk(
   "secrets/create",
   async (message: string, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (session.data.session === null) {
@@ -84,7 +75,7 @@ export const upsertSecret = createAsyncThunk(
 export const getSecret = createAsyncThunk(
   "secrets/get",
   async (userId: string | null, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -141,7 +132,7 @@ export const getSecret = createAsyncThunk(
 export const clearSecret = createAsyncThunk(
   "secrets/clear",
   async (_, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
@@ -165,7 +156,7 @@ export const clearSecret = createAsyncThunk(
 export const getAllSecrets = createAsyncThunk(
   "secrets/getAll",
   async (_, { rejectWithValue }) => {
-    const supabase = await getClient();
+    const supabase = await createProdClient();
     const session = await supabase.auth.getSession();
 
     if (!session.data.session) {
