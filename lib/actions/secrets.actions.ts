@@ -3,6 +3,8 @@ import { createClient } from "@/utils/supabase/client";
 import { Prisma } from "@prisma/client";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+
+
 export const upsertSecret = createAsyncThunk(
   "secrets/create",
   async (message: string, { rejectWithValue }) => {

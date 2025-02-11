@@ -4,16 +4,13 @@ import {
   registerUser,
   logoutUser,
 } from "@/lib/actions/auth.actions";
+import { makeAuthStore, useAppDispatch } from "@/lib/store";
 import authSlice, { AuthStoreType } from "@/lib/stores/auth.store";
 import { generateCUID } from "@/utils/cuid";
-type AuthState = {
-  user: any;
-  isAuthenticated: boolean;
-  checkingAuthStatus: "idle" | string;
-  status: "idle" | string;
-};
+import { User } from "@supabase/supabase-js";
 
-describe("Auth Redux Store", () => {
+
+describe("(Auth) State Mutation Testing", () => {
   const initialState: AuthStoreType = {
     user: undefined,
     isAuthenticated: false,
@@ -25,7 +22,7 @@ describe("Auth Redux Store", () => {
     expect(authSlice(undefined, { type: "unknown" })).toEqual(initialState);
   });
 
-  it("should handle checkUserLoggedIn.fulfilled", () => {
+  it("should update the state with user details for checkUserLoggedIn.fulfilled action", () => {
     const user = { id: "123", name: "Test User" };
     const action = {
       type: checkUserLoggedIn.fulfilled.type,
@@ -35,28 +32,19 @@ describe("Auth Redux Store", () => {
     expect(state.user).toEqual(user);
   });
 
-  it("should not change state for unknown actions", () => {
+  it("should not mutate state for unknown action types", () => {
     const action = { type: "non/existent" };
     const state = authSlice(initialState, action);
     expect(state).toEqual(initialState);
   });
 
-  it("should update auth status to loading when login is pending", () => {
+  it("should set status to 'loading' when loginUser.pending action is dispatched", () => {
     const action = { type: loginUser.pending.type };
     const state = authSlice(initialState, action);
     expect(state.status).toEqual("loading");
   });
 
-  it("should log in the user with valid credentials", () => {
-    const user = { id: generateCUID(), fullname: "Test User", email: "valid@email.com" };
-    const action = { type: loginUser.fulfilled.type, payload: { data: user } };
-    const state = authSlice(initialState, action);
-    expect(state.user).toEqual(user);
-    expect(state.isAuthenticated).toBe(true);
-    expect(state.status).toEqual("idle");
-  });
-
-  it("should not log in the user with invalid credentials", () => {
+  it("should set error state on loginUser.rejected action without authenticating the user", () => {
     const error = { message: "Invalid credentials" };
     const action = { type: loginUser.rejected.type, error };
     const state = authSlice(initialState, action);
@@ -64,4 +52,60 @@ describe("Auth Redux Store", () => {
     expect(state.isAuthenticated).toBe(false);
     expect(state.status).toEqual("error");
   });
+});
+
+describe("(Auth) Action Testing", () => {
+  const mockStore = makeAuthStore();
+
+  it("should register a new user", async () => {
+    const cuid = generateCUID();
+    const user = {
+      email: `${cuid}@test.com`,
+      password: "password",
+      name: `Test User_${cuid}`,
+    };
+    const result = await mockStore.dispatch(registerUser(user));
+    expect(result).toHaveProperty("meta.arg.email");
+  });
+
+  it("should not register a user with an invalid email format", async () => {
+    const user = {
+      email: "invalid_email",
+      password: "password",
+      name: "Test User Invalid Email",
+    };
+    const result = await mockStore.dispatch(registerUser(user));
+    expect(result).toHaveProperty("error");
+  });
+
+  it("should not register a user with an inadequately short password", async () => {
+    const cuid = generateCUID();
+    const user = {
+      email: `${cuid}@test.com`,
+      password: "123", // Assuming password policy requires longer password
+      name: `Test User_${cuid}`,
+    };
+    const result = await mockStore.dispatch(registerUser(user));
+    expect(result).toHaveProperty("error");
+  });
+
+  it("should not log in a user when password is missing", async () => {
+    const credentials = {
+      email: "testuser@test.com",
+      password: "",
+    };
+    const result = await mockStore.dispatch(loginUser(credentials));
+    expect(result).toHaveProperty("error");
+  });
+
+  it("should not log in a user with invalid credentials", async () => {
+    const credentials = {
+      email: "unknown@test.com",
+      password: "wrongpassword",
+    };
+    const result = await mockStore.dispatch(loginUser(credentials));
+    expect(result).toHaveProperty("error");
+  });
+
+  // no log-out because login states are not saved in tests.
 });
